@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import Page from "./Page";
+import { AuthContext } from "./Context";
+import { ecryptInfoText } from "./utils";
 
 function App() {
+  const [auth, setAuth] = useState({
+    state: JSON.parse(localStorage.getItem("auth")) || null,
+    // state: {},
+    set: (_state) => {
+      if (_state) {
+        localStorage.setItem("auth", JSON.stringify(_state));
+      } else {
+        localStorage.removeItem("auth");
+      }
+      setAuth({ ...auth, state: _state });
+    },
+  });
+
+  useEffect(() => {
+    // console.log('auth :::', auth);
+    ecryptInfoText();
+  }, [auth]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthContext.Provider value={auth}>
+      <Page />
+    </AuthContext.Provider>
   );
 }
 

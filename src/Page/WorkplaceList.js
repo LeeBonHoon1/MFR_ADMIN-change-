@@ -1,0 +1,430 @@
+import React, { useState, useEffect } from "react";
+import ReactModal from "react-modal";
+import style from "../Css/Main.module.css";
+import Table from "../Component/Table";
+import { filterDate } from "../utils";
+
+import closeIconPng from "../assets/close-icon.png";
+import trashIconPng from "../assets/trash-icon.png";
+import inputFileExamPng from "../assets/input-file-exam.png";
+
+import { getNotices } from "../Service/nc-api.js";
+import { set } from "react-hook-form";
+
+const Select = ({
+  defaultOption,
+  options, // [{value, label}]
+  onChange,
+}) => {
+  const [active, setActive] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(defaultOption || "");
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    setActive(!active);
+  };
+
+  const handleSelect = (option) => {
+    const _selectedOption = options.find((v) => v.value === option.value);
+
+    setActive(false);
+    setSelectedOption(_selectedOption);
+    onChange(_selectedOption);
+  };
+
+  useEffect(() => {
+    const _handleClick = (e) => {
+      setActive(false);
+    };
+
+    window.addEventListener("click", _handleClick);
+
+    return () => {
+      window.removeEventListener("click", _handleClick);
+    };
+  }, []);
+
+  return (
+    <div className={`form-select ${active ? "active" : ""}`}>
+      <button className="label" onClick={handleClick}>
+        {selectedOption.label}
+      </button>
+      <ul className="optionList">
+        {options.map((v, i) => (
+          <li
+            key={i}
+            className={`optionItem ${
+              selectedOption.value === v.value ? "text-primary" : ""
+            }`}
+            onClick={(e) => {
+              handleSelect(v);
+            }}
+          >
+            {v.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const WorkplaceList = () => {
+  useEffect(() => {
+    // const label = document.querySelector(".label");
+    // const options = document.querySelectorAll(".optionItem");
+    // // 클릭한 옵션의 텍스트를 라벨 안에 넣음
+    // const handleSelect = (item) => {
+    //   label.parentNode.classList.remove("active");
+    //   label.innerHTML = item.textContent;
+    // };
+    // // 옵션 클릭시 클릭한 옵션을 넘김
+    // options.forEach((option) => {
+    //   option.addEventListener("click", () => handleSelect(option));
+    // });
+    // // 라벨을 클릭시 옵션 목록이 열림/닫힘
+    // label.addEventListener("click", () => {
+    //   if (label.parentNode.classList.contains("active")) {
+    //     label.parentNode.classList.remove("active");
+    //   } else {
+    //     label.parentNode.classList.add("active");
+    //   }
+    // });
+  });
+
+  return (
+    <div className="container">
+      <div className="card">
+        <div className="card-header">
+          <h2 className="form-header">사업장관리 - 전체리스트</h2>
+          <div className="form-body">
+            <ul className="form-wrap">
+              <li>
+                <div className="form-title">구분</div>
+                <div className="">
+                  <Select
+                    defaultOption={{ label: "orange", value: 1 }}
+                    options={[
+                      { label: "orange", value: 1 },
+                      { label: "banana", value: 2 },
+                      { label: "apple", value: 3 },
+                    ]}
+                    onChange={(option) => {
+                      console.log(option);
+                    }}
+                  />
+                  {/* <select
+                    class="form-select"
+                    aria-label="Default select example"
+                  >
+                    <option selected>Open this select menu</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                  </select> */}
+                </div>
+              </li>
+              <li>
+                <div className="form-title">얼굴 등록 여부</div>
+                <div className="">
+                  <input className="form-control" type="text" />
+                </div>
+              </li>
+              <li>
+                <div className="form-title">서버상태</div>
+                <div className="">
+                  <div className="form-select">
+                    <Select
+                      defaultOption={{ label: "orange", value: 1 }}
+                      options={[
+                        { label: "orange", value: 1 },
+                        { label: "banana", value: 2 },
+                        { label: "apple", value: 3 },
+                      ]}
+                      onChange={(option) => {
+                        console.log(option);
+                      }}
+                    />
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <div>
+              <button className="btn btn-primary">검색</button>
+            </div>
+          </div>
+        </div>
+        <div className="card-body">
+          <div className="table-caption-top">
+            <span>총 25건</span>
+            <button className="btn btn-secondary">등록</button>
+          </div>
+          <table className="table">
+            <colgroup>
+              <col width="150" />
+              <col width="150" />
+              <col width="*" />
+              <col width="150" />
+              <col width="160" />
+              <col width="184" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>번호</th>
+                <th>구분</th>
+                <th>제목</th>
+                <th>첨부파일</th>
+                <th>등록일</th>
+                <th>조회</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+              <tr>
+                <td>126</td>
+                <td>배포</td>
+                <td className="text-left">이용약관 개정안내</td>
+                <td></td>
+                <td>2021.12.23</td>
+                <td>123</td>
+              </tr>
+            </tbody>
+          </table>
+          <div className="table-caption-bottom">
+            <div>
+              <ul className="form-group">
+                <li className="form-item disabled">
+                  <a href="">&lt;&lt;</a>
+                </li>
+                <li className="form-item">
+                  <a href="">&lt;</a>
+                </li>
+                <li className="form-item active">
+                  <a href="">1</a>
+                </li>
+                <li className="form-item">
+                  <a href="">2</a>
+                </li>
+                <li className="form-item">
+                  <a href="">3</a>
+                </li>
+                <li className="form-item">
+                  <a href="">&gt;</a>
+                </li>
+                <li className="form-item">
+                  <a href="">&gt;&lt;</a>
+                </li>
+              </ul>
+            </div>
+            <div className="text-right">
+              <div className="form-select form-select-sm ml-auto">
+                <button className="label">14개씩보기</button>
+                <ul className="optionList">
+                  <li className="optionItem">10개씩보기</li>
+                  <li className="optionItem">14개씩보기</li>
+                  <li className="optionItem">20개씩보기</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WorkplaceList;
+
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import ReactModal from "react-modal";
+// import Table from "../Component/Table";
+// import style from "../Css/Main.module.css";
+// import { filterLongText } from "../utils";
+
+// import closeIconPng from "../assets/close-icon.png";
+// import WorkplaceRegistModal from "../Component/WorkplaceRegistModal";
+
+// const WorkplaceList = () => {
+//   const [opened, setOpened] = useState({
+//     data: null,
+//     opendRegistModal: false,
+//   });
+
+//   useEffect(() => {
+//     axios.get("http://localhost:4000/workplaces").then((res) => {
+//       if (res.data) {
+//         setOpened({
+//           ...opened,
+//           data: res.data.map((v) => ({
+//             ...v,
+//             qr: filterLongText(v.qr, 25),
+//           })),
+//         });
+//       }
+//     });
+//   }, []);
+
+//   function openRegistModal() {
+//     setOpened({
+//       ...opened,
+//       opendRegistModal: true,
+//     });
+//   }
+
+//   function closeRegistModal() {
+//     setOpened({
+//       ...opened,
+//       opendRegistModal: false,
+//     });
+//   }
+
+//   return (
+//     <>
+//       <div className={style.contentTitle}>전체리스트</div>
+//       <Table
+//         topButtonItem={{
+//           text: "사업장 등록",
+//           onClick: openRegistModal,
+//         }}
+//         columnNames={{
+//           name: "사업장명",
+//           address: "주소",
+//           sms: "SMS전송",
+//           mail: "메일전송",
+//           qr: "Qr",
+//         }}
+//         columnWidths={{ name: 10, address: 35, sms: 10, mail: 10, qr: 20 }}
+//         data={opened.data}
+//       />
+//       <ReactModal
+//         isOpen={opened.opendRegistModal}
+//         onRequestClose={closeRegistModal}
+//         ariaHideApp={false}
+//         style={{
+//           content: {
+//             top: "calc((100% - 70%) / 2 )",
+//             left: "calc((100% - 70%) / 2)",
+//             width: "70%",
+//             height: "70%",
+//             overflowY: "scroll",
+//           },
+//         }}
+//         contentLabel="Regist Modal"
+//       >
+//         <img
+//           src={closeIconPng}
+//           alt="regist close"
+//           style={{ float: "right", cursor: "pointer" }}
+//           onClick={closeRegistModal}
+//         ></img>
+//         <div className={style.modalTitle2}>사업장 등록</div>
+//         <WorkplaceRegistModal onClose={closeRegistModal}></WorkplaceRegistModal>
+//       </ReactModal>
+//     </>
+//   );
+// };
+
+// export default WorkplaceList;
